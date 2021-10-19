@@ -226,5 +226,54 @@ switch($data){
     echo '1,2ではありません';
 };
 ?>
+
+<h2>関数</h2>
+<?php
+// インプットなしアウトプットなし
+function test(){
+  echo 'test';
+};
+test();
+
+// インプットありアウトプットなし
+function getComment($string){
+   echo $string;
+};
+getComment('test');
+
+// インプットなしアウトプットあり
+function getNumberOfComment(){
+  return 5;
+};
+
+$number = getNumberOfComment();
+echo $number;
+
+
+// インプットありアウトプットあり
+function sumPrice($int1,$int2){
+  $int3 = $int1 + $int2;
+  return $int3;
+};
+$total = sumPrice(3,5);
+echo '<br>';
+echo $total;
+
+
+// 組み込み関数を活用して関数を自作する
+
+$postalcode = '123-4567';
+
+function checkPostakCode($str){
+  $replaced = str_replace('-','',$str);
+  $length = strlen($replaced);
+  if ($length === 7){
+    return true;
+  };
+  return false;
+}
+echo '<br>';
+echo checkPostakCode($postalcode);
+?>
 </body>
 </html>
