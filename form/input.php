@@ -3,6 +3,11 @@
 session_start();
 
 
+require 'validation.php';
+
+
+
+
 // if(!empty($_POST['your_name'])){
 //   echo $_POST['your_name'];
 // };
@@ -22,7 +27,8 @@ function h($str)
 // CSRF にせもののページ -> input.php
 // sessionを用いて対策
 $pageFlag =0;
-if(!empty($_POST['btn_confirm'])){
+$errors = validation($_POST);
+if(!empty($_POST['btn_confirm']) && empty($errors)){
   $pageFlag = 1;
 };
 if(!empty($_POST['btn_submit'])){
@@ -32,15 +38,19 @@ if(!empty($_POST['btn_submit'])){
 
 ?>
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-</head>
-<body>
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <title>Hello, world!</title>
+  </head>
+<body class="container">
 
 <?php if($pageFlag=== 0) : ?>
   <?php
@@ -50,30 +60,63 @@ if(!empty($_POST['btn_submit'])){
   }
   $token = $_SESSION['csrfToken']
   ?>
+
+  <?php if(!empty($errors) && !empty($_POST['btn_confirm'])) :?>
+    <?php
+    echo '<ul>';
+    foreach ($errors as $error) {
+        echo '<li>' . $error . '</li>';
+      }
+    echo '</ul>';
+    ?>
+  <?php endif; ?>
   <form method = "POST" action="input.php">
-    氏名
-    <input type="text" name = "your_name" value="<?php if(!empty($_POST['your_name'])){ echo h($_POST['your_name']);}; ?>"></br>
-    メールアドレス
-    <input type="email" name = "email" value="<?php if(!empty($_POST['email'])){ echo h($_POST['email']);}; ?>"></br>
-    ホームページ
-    <input type="url"  name = "url" value="<?php if(!empty($_POST['url'])){ echo h($_POST['url']);}; ?>"></br>
+    <div class="form-group">
+      <label for="your_name">氏名</label>
+      <input type="text" name = "your_name" value="<?php if(!empty($_POST['your_name'])){ echo h($_POST['your_name']);}; ?>" class="form-control"></br>
+    </div>
+    <div class="form-group">
+      <label for="email">メールアドレス</label>
+      <input type="email" name = "email" value="<?php if(!empty($_POST['email'])){ echo h($_POST['email']);}; ?>" class="form-control"></br>
+    </div>
+    
+    <div class="form-group">
+      <label for="url">ホームページ</label>
+      <input type="url"  name = "url" value="<?php if(!empty($_POST['url'])){ echo h($_POST['url']);}; ?>" class="form-control"></br>
+    </div>
     性別
-    <input type="radio" name="gender" value="0" <?php if(!isset($_POST['gender'])){if($_POST['gender'] === '0'){echo 'checked';}}?>>男性
-    <input type="radio" name="gender" value="1" <?php if(!isset($_POST['gender']) && $_POST['gender'] === '1'){echo 'checked';}?>>女性<br>
-    年齢
-    <select name="age">
-      <option value="0">選択してください</option>
-      <option value="1">~19歳</option>
-      <option value="2">20歳〜29歳</option>
-      <option value="3">30歳〜39歳</option>
-      <option value="4">40歳〜49歳</option>
-      <option value="5">50歳〜59歳</option>
-      <option value="6">60歳〜</option>
-    </select><br>
-    お問い合わせ内容<br>
-    <textarea name="contact" id="" cols="30" rows="10">
-      <?php if(!empty($_POST['contact'])){ echo h($_POST['contact']);}; ?>
-    </textarea><br>
+    <div class="form-check form-check-inline">
+      <input type="radio" name="gender" value="0" 
+        <?php
+          if(isset($_POST['gender'])){
+            if($_POST['gender'] === '0'){
+              echo 'checked';
+            };
+          };
+        ?>><label for="gender" class="form-check-label">男性</label>
+      <input type="radio" name="gender" value="1" <?php if(isset($_POST['gender']) && $_POST['gender'] === '1'){echo 'checked';}?>><label for="gender" class="form-check-label">女性　</label>
+    </div>
+
+    
+    <div class="form-group">
+      <label for="age">年齢</label>
+        <select name="age" class="form-control">
+          <option value="0">選択してください</option>
+          <option value="1">~19歳</option>
+          <option value="2">20歳〜29歳</option>
+          <option value="3">30歳〜39歳</option>
+          <option value="4">40歳〜49歳</option>
+          <option value="5">50歳〜59歳</option>
+          <option value="6">60歳〜</option>
+        </select><br>
+    </div>
+
+
+    <div class="form-group">
+      <label for="contact">お問い合わせ内容</label>
+        <textarea name="contact" id="" class="form-control"><?php if(!empty($_POST['contact'])){ echo h($_POST['contact']);}; ?></textarea><br>
+    </div>
+
     注意事項のチェック<br>
     <input type="checkbox" name="caution" value="1">注意事項にチェックする。<br>
     <input type="hidden" name="csrf" value="<?php echo $token; ?>">
